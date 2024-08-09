@@ -43,8 +43,8 @@ RUN chmod g+s /var/log \
   && chown -R container-user:container-user /var/log
 
 
-#USER container-user
-#RUN whoami
+USER container-user
+RUN whoami
 
 WORKDIR /app/src
 
