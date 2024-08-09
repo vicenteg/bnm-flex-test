@@ -1,9 +1,8 @@
 import argparse
 import logging
 import re
-from apache_beam import Pipeline, PTransform, WindowInto, DoFn, ParDo
-from apache_beam.io import ReadFromText
-from apache_beam.io.gcp.gcsio import GcsIO
+from apache_beam import Pipeline, PTransform, DoFn, ParDo, CombinePerKey, Map
+from apache_beam.io import ReadFromText, WriteToText
 from apache_beam.options.pipeline_options import PipelineOptions, SetupOptions
 
 class WordCountOptions(PipelineOptions):
@@ -18,19 +17,22 @@ class WordCountOptions(PipelineOptions):
             help="GCS file to write output to (e.g., gs://your-bucket/output/word_counts.txt)",
         )
 
+
 class ExtractWordsFn(DoFn):
     def process(self, element):
         return re.findall(r'[\w\']+', element, re.UNICODE)
+
 
 class CountWords(PTransform):
     def expand(self, pcoll):
         return (
             pcoll
             | "ExtractWords" >> ParDo(ExtractWordsFn())
-            | "PairWithOne" >> ParDo(lambda x: (x, 1))
-            | "GroupAndSum" >> CombineGlobally(lambda x: sum(x)).without_defaults()
+            | "PairWithOne" >> Map(lambda x: (x, 1))
+            | "GroupAndSum" >> CombinePerKey(sum)
             | "FormatOutput" >> ParDo(lambda word_count: f"{word_count[0]}: {word_count[1]}")
         )
+
 
 def run(argv=None, save_main_session=True):
     parser = argparse.ArgumentParser()
@@ -47,6 +49,7 @@ def run(argv=None, save_main_session=True):
             | "CountWords" >> CountWords()
             | "WriteToGCS" >> WriteToText(word_count_options.output_file)
         )
+
 
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)

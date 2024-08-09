@@ -1,5 +1,5 @@
-FROM python:3.11-slim AS build
-
+# FROM python:3.11-slim AS build
+FROM gcr.io/dataflow-templates-base/python311-template-launcher-base@sha256:769c5c5f877830cff520974ec9f43d0921a12ad3a16db35d5c7c0db2002d5c14
 WORKDIR /app
 
 # COPY the script and dependencies
@@ -14,7 +14,8 @@ RUN apt update \
 # This removes dependencies of packages that are no longer installed
     && apt autoremove -y
 
-COPY --from=gcr.io/dataflow-templates-base/python311-template-launcher-base:20230622_RC00 /opt/google/dataflow/python_template_launcher /opt/google/dataflow/python_template_launcher
+# - vg - unclear why we don't just use the base image above?
+# COPY --from=gcr.io/dataflow-templates-base/python311-template-launcher-base:20230622_RC00 /opt/google/dataflow/python_template_launcher /opt/google/dataflow/python_template_launcher
 
 # Update the OS packages
 RUN pip install --upgrade pip
