@@ -6,23 +6,19 @@ WORKDIR /app
 COPY . .
 
 # Update the OS packages
-RUN apt update \
+RUN apt update -y \
     && apt upgrade \
     && apt install curl -y \
-    && apt remove libharfbuzz0b 6.0.0+dfsg-3 -y \
-    && apt remove perl-base 5.36.0-7+deb12u1 -y \
-    && apt remove libtiff6 4.5.0-6+deb12u1 -y \
-    && apt remove libexpat1 2.5.0-1 -y \
-    && apt remove libsqlite3-0 3.40.1-2 -y \
-    && apt remove libnss3 2:3.87.1-1 -y \
-    && apt remove libxml2 2.9.14+dfsg-1.3~deb12u1 -y \
-    && apt remove openssl 3.0.13-1~deb12u1 -y \
-    && apt remove libssl3 3.0.13-1~deb12u1 -y \
-    && apt remove libnss3 2:3.87.1-1 -y \
-    && apt remove libtiff6 4.5.0-6+deb12u1 -y \
-    # This removes packages that can no longer be downloaded
+    && apt remove libharfbuzz0b -y \
+    && apt remove libtiff6  -y \
+    && apt remove libsqlite3-0 -y \
+    && apt remove libnss3 -y \
+    && apt remove libxml2 -y \
+    && apt remove openssl -y \
+    && apt remove libssl3 -y \
+    && apt remove libnss3 -y \
+    && apt remove libtiff6 -y \
     && apt autoclean -y \
-    # This removes dependencies of packages that are no longer installed
     && apt autoremove -y
 
 # - vg - unclear why we don't just use the base image above?
